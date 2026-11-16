@@ -176,6 +176,14 @@ jobs:
         done > sources.txt
         cat sources.txt
 
+        # LGPL source offer: every component exactly as built (patches applied), plus this repository.
+        if [ "${{ github.event.inputs.github_release }}" = "true" ]; then
+          mkdir -p "$GITHUB_WORKSPACE/source"
+          tar -C "$GITHUB_WORKSPACE" --exclude=.git --exclude=source -cf - . | tar -C "$GITHUB_WORKSPACE/source" -xf - --one-top-level=build-repo
+          tar -cf - --exclude=.git . | tar -C "$GITHUB_WORKSPACE/source" -xf - --one-top-level=components
+          tar -C "$GITHUB_WORKSPACE/source" -cJf "$GITHUB_WORKSPACE/source.tar.xz" .
+        fi
+
         ./clean
         ./build -j$(nproc)
 
@@ -195,7 +203,7 @@ jobs:
         short_date=$(date "+%Y%m%d")
         
         # Set release tag as environment variable
-        echo "RELEASE_TAG=lgpl-${short_date}" >> $GITHUB_ENV
+        echo "RELEASE_TAG=lgpl-${short_date}-${{ github.run_number }}" >> $GITHUB_ENV
         
         # Package libmpv.so.2
         libmpv_file="$GITHUB_WORKSPACE/artifacts/libmpv.so.2"
@@ -204,6 +212,7 @@ jobs:
         if [ -f "$libmpv_file" ]; then
           echo "Packaging libmpv.so.2 as $libmpv_archive"
           zip -j $libmpv_archive $libmpv_file "$GITHUB_WORKSPACE/artifacts/sources.txt"
+          mv "$GITHUB_WORKSPACE/source.tar.xz" "libmpv_lgpl_${{ matrix.arch }}_source.tar.xz"
         else
           echo "libmpv.so.2 not found at $libmpv_file"
           exit 1
@@ -233,6 +242,7 @@ jobs:
           **Workflow run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         files: |
           libmpv_*.zip
+          libmpv_*_source.tar.xz
         draft: false
         prerelease: false
       env:
