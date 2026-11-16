@@ -168,10 +168,19 @@ jobs:
         done
         cd ../
 
+        # The exact revision of every component, for the LGPL source offer (patches: this repo's patch/).
+        for d in */; do
+          if [ -e "$d.git" ]; then
+            echo "${d%/} $(git -C "$d" remote get-url origin) $(git -C "$d" rev-parse HEAD)"
+          fi
+        done > sources.txt
+        cat sources.txt
+
         ./clean
         ./build -j$(nproc)
 
         mkdir -p $GITHUB_WORKSPACE/artifacts
+        cp sources.txt $GITHUB_WORKSPACE/artifacts/
         cp -r mpv/build/* $GITHUB_WORKSPACE/artifacts
 
     - name: Upload artifacts
@@ -194,7 +203,7 @@ jobs:
         
         if [ -f "$libmpv_file" ]; then
           echo "Packaging libmpv.so.2 as $libmpv_archive"
-          zip -j $libmpv_archive $libmpv_file
+          zip -j $libmpv_archive $libmpv_file "$GITHUB_WORKSPACE/artifacts/sources.txt"
         else
           echo "libmpv.so.2 not found at $libmpv_file"
           exit 1
