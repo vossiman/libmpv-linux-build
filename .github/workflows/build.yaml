@@ -104,6 +104,9 @@ jobs:
 
         > mpv_options
         printf "%s\n" -Dlibmpv=true >> mpv_options
+        # LGPL build: mpv defaults to gpl=true, and links Rubber Band (GPL) whenever found.
+        printf "%s\n" -Dgpl=false >> mpv_options
+        printf "%s\n" -Drubberband=disabled >> mpv_options
         printf "%s\n" -Duchardet=enabled >> mpv_options
         printf "%s\n" -Dsndio=disabled >> mpv_options
         printf "%s\n" -Dcaca=disabled >> mpv_options
@@ -183,11 +186,11 @@ jobs:
         short_date=$(date "+%Y%m%d")
         
         # Set release tag as environment variable
-        echo "RELEASE_TAG=${short_date}" >> $GITHUB_ENV
+        echo "RELEASE_TAG=lgpl-${short_date}" >> $GITHUB_ENV
         
         # Package libmpv.so.2
         libmpv_file="$GITHUB_WORKSPACE/artifacts/libmpv.so.2"
-        libmpv_archive="libmpv_${{ matrix.arch }}.zip"
+        libmpv_archive="libmpv_lgpl_${{ matrix.arch }}.zip"
         
         if [ -f "$libmpv_file" ]; then
           echo "Packaging libmpv.so.2 as $libmpv_archive"
@@ -199,7 +202,7 @@ jobs:
         
         # Package header files from include/mpv
         header_dir="$GITHUB_WORKSPACE/include/mpv"
-        header_archive="libmpv_${{ matrix.arch }}_header.zip"
+        header_archive="libmpv_lgpl_${{ matrix.arch }}_header.zip"
         
         if [ -d "$header_dir" ]; then
           echo "Packaging header files from $header_dir as $header_archive"
