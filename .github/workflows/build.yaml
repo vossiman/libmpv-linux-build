@@ -42,7 +42,7 @@ jobs:
             libdvdnav-dev libegl1-mesa-dev libepoxy-dev libfontconfig-dev libfreetype6-dev \
             libfribidi-dev libgl1-mesa-dev libgbm-dev libgme-dev libgsm1-dev libharfbuzz-dev libjpeg-dev \
             libbrotli-dev liblcms2-dev libmodplug-dev libmp3lame-dev libopenal-dev \
-            libopus-dev libopencore-amrnb-dev libopencore-amrwb-dev libpulse-dev librtmp-dev \
+            libopus-dev libopencore-amrnb-dev libopencore-amrwb-dev libpipewire-0.3-dev libpulse-dev librtmp-dev \
             libsdl2-dev libsixel-dev libssh-dev libsoxr-dev libspeex-dev libtool \
             libv4l-dev libva-dev libvdpau-dev libvorbis-dev libvo-amrwbenc-dev \
             libunwind-dev libvpx-dev libwayland-dev libx11-dev libxext-dev \
@@ -108,6 +108,9 @@ jobs:
         printf "%s\n" -Dgpl=false >> mpv_options
         printf "%s\n" -Drubberband=disabled >> mpv_options
         printf "%s\n" -Duchardet=enabled >> mpv_options
+        # Native PipeWire output: through pulse, the audio clock jitters and
+        # video-sync=audio drops about 6% of frames at 60 fps (lean-iptv LEANIPTV-168).
+        printf "%s\n" -Dpipewire=enabled >> mpv_options
         printf "%s\n" -Dsndio=disabled >> mpv_options
         printf "%s\n" -Dcaca=disabled >> mpv_options
         printf "%s\n" -Djpeg=disabled >> mpv_options
